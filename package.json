@@ -1,0 +1,58 @@
+{
+  "name": "layoverload-web",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^5.15.3",
+    "@mui/material": "^5.15.3",
+    "@mui/material-next": "^6.0.0-alpha.119",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.18",
+    "cra-template-typescript": "1.2.0",
+    "react": "^18.2.0",
+    "react-animated-cursor": "^2.11.2",
+    "react-app-rewired": "^2.2.1",
+    "react-dom": "^18.2.0",
+    "react-lorem-ipsum": "^1.4.10",
+    "react-markdown": "^9.0.1",
+    "react-notion": "^0.10.0",
+    "react-ripples": "^2.2.1",
+    "react-router-dom": "^6.21.3",
+    "react-scripts": "5.0.1",
+    "react-scroll": "^1.9.0",
+    "react-slideshow-image": "^4.3.0",
+    "react-syntax-highlighter": "^15.5.0",
+    "styled-components": "^6.1.6",
+    "styled-reset": "^4.5.2",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/navermaps": "^3.7.8"
+  }
+}
