@@ -27,7 +27,7 @@ function extractRepresentativeCoordinatesByCount(path: LatLng[], count: number):
 }
 
 function requestRouteInitial(waypoint: string, start: naver.maps.LatLng, dest: naver.maps.LatLng, setInitRoute: React.Dispatch<React.SetStateAction<naver.maps.LatLng[]>>, setRoutes: React.Dispatch<React.SetStateAction<RouteResult[]>>) {
-    axios.get<RouteResponse>(`naverapi/map-direction/v1/driving?goal=${dest.lng()}%2C${dest.lat()}&start=${start.lng()}%2C${start.lat()}`, {
+    axios.get<RouteResponse>(`/api/proxyNaverAPI/map_init?startLat=${start.lat()}&startLng=${start.lng()}&destLat=${dest.lat()}&destLng=${dest.lng()}`, {
         headers: {
             "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_MAP_CLIENT_ID,
             "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVER_MAP_CLIENT_SECRET
@@ -36,10 +36,25 @@ function requestRouteInitial(waypoint: string, start: naver.maps.LatLng, dest: n
         if (response.data.route.traoptimal.length > 0) {
             const path = response.data.route.traoptimal[0].path.map(point => new naver.maps.LatLng(point[1], point[0]));
             if (path.length > 0) {
-                const represent = extractRepresentativeCoordinatesByCount(path, 3);
-                setInitRoute(represent);
-                console.log(represent);
-                requestWaypoints(represent, waypoint, start, dest, setRoutes);
+                if (waypoint !== "") {
+                    const represent = extractRepresentativeCoordinatesByCount(path, 3);
+                    setInitRoute(represent);
+                    requestWaypoints(represent, waypoint, start, dest, setRoutes);
+                } else {
+                    const results: RouteResult[] = [];
+                    const summary = response.data.route.traoptimal[0].summary;
+                    const result = {
+                        waypoint: "",
+                        latLng: dest,
+                        distance: summary.distance,
+                        duration: summary.duration,
+                        tollFare: summary.tollFare,
+                        taxiFare: summary.taxiFare,
+                        path: path
+                    }
+                    results.push(result)
+                    setRoutes(results);
+                }
             }
         }
     })
@@ -82,50 +97,47 @@ interface WaypointResponse {
 function requestWaypoints(routes: naver.maps.LatLng[], waypoint: string, start: LatLng, dest: LatLng, setRoutes: React.Dispatch<React.SetStateAction<RouteResult[]>>) {
     const results: RouteResult[] = [];
 
-    routes.forEach(route => {
-        axios.get<WaypointResponse>(`https://dapi.kakao.com/v2/local/search/keyword.JSON?query=${waypoint}&x=${route.lng()}&y=${route.lat()}&sort=accuracy&page=1&size=3`, {
-            headers: {
-                Authorization: process.env.REACT_APP_KAKAO_API_KEY
-            }
-        }).then(response => {
-            if (response.data.documents.length > 0) {
-                console.log(response.data.documents[0]);
-                const title = response.data.documents[0].place_name;
-                const latLng = new naver.maps.LatLng(dest.lng(), dest.lat());
-                axios.get<RouteResponse>(`naverapi/map-direction/v1/driving?goal=${dest.lng()}%2C${dest.lat()}&start=${start.lng()}%2C${start.lat()}&waypoints=${response.data.documents[0].x},${response.data.documents[0].y}`, {
-                    headers: {
-                        "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_MAP_CLIENT_ID,
-                        "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVER_MAP_CLIENT_SECRET
-                    }
-                }).then(response => {
-                    console.log(response.data);
-                    if (response.data.route.traoptimal.length > 0) {
-                        const summary = response.data.route.traoptimal[0].summary;
-                        const path = response.data.route.traoptimal[0].path.map(point => new naver.maps.LatLng(point[1], point[0]));
-                        const result = {
-                            waypoint: title,
-                            latLng: latLng,
-                            distance: summary.distance,
-                            duration: summary.duration,
-                            tollFare: summary.tollFare,
-                            taxiFare: summary.taxiFare,
-                            path: path
+    if (routes.length !== 0) {
+        routes.forEach(route => {
+            axios.get<WaypointResponse>(`https://dapi.kakao.com/v2/local/search/keyword.JSON?query=${waypoint}&x=${route.lng()}&y=${route.lat()}&sort=accuracy&page=1&size=3`, {
+                headers: {
+                    Authorization: process.env.REACT_APP_KAKAO_API_KEY
+                }
+            }).then(response => {
+                if (response.data.documents.length > 0) {
+                    const title = response.data.documents[0].place_name;
+                    const latLng = new naver.maps.LatLng(dest.lng(), dest.lat());
+
+                    axios.get<RouteResponse>(`/api/proxyNaverAPI/map?startLat=${start.lat()}&startLng=${start.lng()}&destLat=${dest.lat()}&destLng=${dest.lng()}&wayLat=${response.data.documents[0].y}&wayLng=${response.data.documents[0].x}`, {
+                    }).then(response => {
+                        if (response.data.route.traoptimal.length > 0) {
+                            const summary = response.data.route.traoptimal[0].summary;
+                            const path = response.data.route.traoptimal[0].path.map(point => new naver.maps.LatLng(point[1], point[0]));
+                            const result = {
+                                waypoint: title,
+                                latLng: latLng,
+                                distance: summary.distance,
+                                duration: summary.duration,
+                                tollFare: summary.tollFare,
+                                taxiFare: summary.taxiFare,
+                                path: path
+                            }
+                            results.push(result)
                         }
-                        results.push(result)
-                    }
-                })
-                    .catch(error => {
-                        console.log(error);
                     })
-            }
+                        .catch(error => {
+                            console.log(error);
+                        })
+                }
+            })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    setRoutes(results);
+                })
         })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                setRoutes(results);
-            })
-    })
+    }
 }
 
 function toRoadAddress(results: Result[]): string {
@@ -289,30 +301,8 @@ interface Guide {
 
 function convertAddress(latLng: naver.maps.LatLng, setAddress: React.Dispatch<React.SetStateAction<string>>) {
     // @ts-ignore
-    // console.log(process.env.REACT_APP_NAVER_MAP_CLIENT_ID);
-    // console.log(process.env.REACT_APP_NAVER_MAP_CLIENT_SECRET);
-    // fetch(`https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${latLng.lng()}%2C${latLng.lat()}&output=json&orders=legalcode%2Cadmcode%2Caddr%2Croadaddr`, {
-    //     mode: 'no-cors',
-    //     method: 'GET',
-    //     headers: {
-    //         "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_MAP_CLIENT_ID || "fd38h4wr3e",
-    //         "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVER_MAP_CLIENT_SECRET || "mzF8dkqK4euyaBc7XtWCuPm4NyCo4Q4TGke1KkfX",
-    //     }
-    // })
-    // axios.get<ApiResponse>(`https://ienlab-layoveroad.cloudfunctions.net/proxyNaverAPI?lat=${latLng.lat()}&lng=${latLng.lng()}`, {
-    // axios.get<ApiResponse>(`https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${latLng.lng()}%2C${latLng.lat()}&output=json&orders=legalcode%2Cadmcode%2Caddr%2Croadaddr`, {
-    axios.get<ApiResponse>(`naverapi/map-reversegeocode/v2/gc?coords=${latLng.lng()}%2C${latLng.lat()}&output=json&orders=legalcode%2Cadmcode%2Caddr%2Croadaddr`, {
-        headers: {
-            "X-NCP-APIGW-API-KEY-ID": process.env.REACT_APP_NAVER_MAP_CLIENT_ID,
-            "X-NCP-APIGW-API-KEY": process.env.REACT_APP_NAVER_MAP_CLIENT_SECRET,
-        }
-    })
+    axios.get<ApiResponse>(`/api/proxyNaverAPI/value?lat=${latLng.lat()}&lng=${latLng.lng()}`)
         .then(response => {
-            console.log(`req: ${JSON.stringify(response.request)}`);
-            console.log(`header: ${JSON.stringify(response)}`);
-            console.log(`config: ${JSON.stringify(response.config)}`);
-            // console.log(`data: ${response.request}`);
-            // console.log(`data: ${JSON.stringify(response.data)}`);
             setAddress(toRoadAddress(response.data.results))
         })
         .catch(error => {
