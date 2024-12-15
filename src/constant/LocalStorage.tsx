@@ -1,5 +1,7 @@
 export default {
     Key: {
-        IS_DARK_MODE: 'isDarkMode'
+        IS_DARK_MODE: 'isDarkMode',
+        BOOKMARKS: 'bookmarks',
+        HISTORY: 'history',
     }
 }

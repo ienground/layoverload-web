@@ -1,31 +1,34 @@
 import React from "react";
 import styled, {useTheme} from "styled-components";
-import {SidebarProps} from "./Sidebar";
+import {SidebarProps} from "./sidebar/Sidebar";
 import {AppProps} from "../../App";
 import mainIcon from "../../assets/icon_final.svg";
 import {Icon} from "@mui/material";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import {Bookmarks, ForkLeft, Map} from "@mui/icons-material";
+import {TransportProps} from "../screens/home/transport/TransportScreen";
 
 type Props = SidebarProps & AppProps;
 
-export default function Header({isOpen, setIsOpen, darkMode, setDarkMode}: Props) {
+export default function Header({isOpen, setIsOpen, currentTab, setCurrentTab, darkMode, setDarkMode}: Props) {
     const theme = useTheme();
 
     return (
         <Wrapper>
             <MenuButtonGroup>
                 <Logo />
-                <MenuButton>
+                <MenuButton className={currentTab === 0 ? "selected" : ""} onClick={() => {
+                    setCurrentTab(0);
+                }}>
                     <Icon baseClassName={"material-icons-round"}><Map /></Icon>
                     <div>지도</div>
                 </MenuButton>
-                <MenuButton>
+                <MenuButton className={currentTab === 1 || currentTab === 2 ? "selected" : ""} onClick={() => setCurrentTab(1)}>
                     <Icon baseClassName={"material-icons-round"}><ForkLeft /></Icon>
                     <div>길찾기</div>
                 </MenuButton>
-                <MenuButton>
+                <MenuButton className={currentTab === 3 ? "selected" : ""} onClick={() => setCurrentTab(3)}>
                     <Icon baseClassName={"material-icons-round"}><Bookmarks /></Icon>
                     <div>북마크</div>
                 </MenuButton>
@@ -87,7 +90,7 @@ const MenuButton = styled.button`
         transition: color 0.3s ease;
     }
     
-    &:hover {
+    &.selected, &:hover {
         background-color: ${props => props.theme.colors.colorPrimary};
         
         & > span, div {
