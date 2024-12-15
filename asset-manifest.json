@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/layoveroad-web/static/css/main.65d98edb.css",
-    "main.js": "/layoveroad-web/static/js/main.7e2db21f.js",
-    "static/js/453.75c7b9de.chunk.js": "/layoveroad-web/static/js/453.75c7b9de.chunk.js",
-    "static/media/icon_final.svg": "/layoveroad-web/static/media/icon_final.8f1ced07663a9eecac9ee791b7ae1df0.svg",
-    "index.html": "/layoveroad-web/index.html",
-    "main.65d98edb.css.map": "/layoveroad-web/static/css/main.65d98edb.css.map",
-    "main.7e2db21f.js.map": "/layoveroad-web/static/js/main.7e2db21f.js.map",
-    "453.75c7b9de.chunk.js.map": "/layoveroad-web/static/js/453.75c7b9de.chunk.js.map"
+    "main.css": "/layoverload-web/static/css/main.65d98edb.css",
+    "main.js": "/layoverload-web/static/js/main.7b536761.js",
+    "static/js/453.75c7b9de.chunk.js": "/layoverload-web/static/js/453.75c7b9de.chunk.js",
+    "static/media/icon_final.svg": "/layoverload-web/static/media/icon_final.8f1ced07663a9eecac9ee791b7ae1df0.svg",
+    "index.html": "/layoverload-web/index.html",
+    "main.65d98edb.css.map": "/layoverload-web/static/css/main.65d98edb.css.map",
+    "main.7b536761.js.map": "/layoverload-web/static/js/main.7b536761.js.map",
+    "453.75c7b9de.chunk.js.map": "/layoverload-web/static/js/453.75c7b9de.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.65d98edb.css",
-    "static/js/main.7e2db21f.js"
+    "static/js/main.7b536761.js"
   ]
 }
